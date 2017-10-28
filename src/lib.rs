@@ -1,3 +1,4 @@
+//! Representations of directions
 extern crate cgmath;
 #[macro_use] extern crate enum_primitive;
 extern crate serde;
@@ -10,8 +11,15 @@ use enum_primitive::FromPrimitive;
 pub const NUM_DIRECTIONS: usize = 8;
 pub const NUM_CARDINAL_DIRECTIONS: usize = 4;
 pub const NUM_ORDINAL_DIRECTIONS: usize = 4;
-pub const ALL_DIRECTIONS_BITMAP: u8 = 0xff;
-pub const NO_DIRECTIONS_BITMAP: u8 = 0;
+pub const ALL_DIRECTIONS_BITMAP_RAW: u8 = 0xff;
+pub const NO_DIRECTIONS_BITMAP_RAW: u8 = 0;
+
+pub const ALL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
+    raw: ALL_DIRECTIONS_BITMAP_RAW,
+};
+pub const NO_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
+    raw: NO_DIRECTIONS_BITMAP_RAW,
+};
 
 enum_from_primitive! {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -235,6 +243,7 @@ impl From<OrdinalDirection> for Direction {
 
 macro_rules! make_direction_iter {
     ($col_name:ident, $iter_name:ident, $type:ident) => {
+        /// Iterator over all directions of the respectively-named type of direction
         pub struct $iter_name(u8);
         impl Iterator for $iter_name {
             type Item = $type;
@@ -245,6 +254,7 @@ macro_rules! make_direction_iter {
             }
         }
 
+        /// Represents a collection of the respectively-named type of direction
         #[derive(Clone, Copy)]
         pub struct $col_name;
         impl IntoIterator for $col_name {
@@ -265,6 +275,7 @@ make_direction_iter!{OrdinalDirections, OrdinalDirectionIter, OrdinalDirection}
 
 macro_rules! make_subdirection_iter {
     ($col_name:ident, $backing_col_name:ident, $iter_name:ident, $backing_iter_name:ident) => {
+        /// Iterator over a particular collection of `Direction`s
         pub struct $iter_name($backing_iter_name);
         impl Iterator for $iter_name {
             type Item = Direction;
@@ -274,6 +285,7 @@ macro_rules! make_subdirection_iter {
         }
 
         #[derive(Clone, Copy)]
+        /// Represents a particular collection of `Direction`s
         pub struct $col_name;
         impl IntoIterator for $col_name {
             type Item = Direction;
@@ -308,6 +320,7 @@ impl From<OrdinalDirection> for Vector2<i32> {
     }
 }
 
+/// Set of directions implemented as a bitmap
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct DirectionBitmap {
     pub raw: u8,
