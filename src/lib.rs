@@ -334,11 +334,11 @@ impl DirectionBitmap {
     }
 
     pub fn empty() -> Self {
-        Self::new(NO_DIRECTIONS_BITMAP)
+        NO_DIRECTIONS_BITMAP
     }
 
     pub fn all() -> Self {
-        Self::new(ALL_DIRECTIONS_BITMAP)
+        ALL_DIRECTIONS_BITMAP
     }
 
     pub fn has(self, direction: Direction) -> bool {
