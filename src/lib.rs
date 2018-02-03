@@ -381,3 +381,80 @@ impl BitAndAssign for DirectionBitmap {
         self.raw &= rhs.raw;
     }
 }
+
+impl From<CardinalDirection> for [i32; 2] {
+    fn from(c: CardinalDirection) -> [i32; 2] {
+        use self::CardinalDirection::*;
+        match c {
+            North => [ 0, -1],
+            East  => [ 1,  0],
+            South => [ 0,  1],
+            West  => [-1,  0],
+        }
+    }
+}
+impl From<CardinalDirection> for (i32, i32) {
+    fn from(c: CardinalDirection) -> (i32, i32) {
+        use self::CardinalDirection::*;
+        match c {
+            North => ( 0, -1),
+            East  => ( 1,  0),
+            South => ( 0,  1),
+            West  => (-1,  0),
+        }
+    }
+}
+
+impl From<OrdinalDirection> for [i32; 2] {
+    fn from(o: OrdinalDirection) -> [i32; 2] {
+        use self::OrdinalDirection::*;
+        match o {
+            NorthWest => [-1, -1],
+            NorthEast => [ 1, -1],
+            SouthEast => [ 1,  1],
+            SouthWest => [-1,  1],
+        }
+    }
+}
+impl From<OrdinalDirection> for (i32, i32) {
+    fn from(o: OrdinalDirection) -> (i32, i32) {
+        use self::OrdinalDirection::*;
+        match o {
+            NorthWest => (-1, -1),
+            NorthEast => ( 1, -1),
+            SouthEast => ( 1,  1),
+            SouthWest => (-1,  1),
+        }
+    }
+}
+
+impl From<Direction> for [i32; 2] {
+    fn from(d: Direction) -> [i32; 2] {
+        use self::Direction::*;
+        match d {
+            North => [ 0, -1],
+            East  => [ 1,  0],
+            South => [ 0,  1],
+            West  => [-1,  0],
+            NorthWest => [-1, -1],
+            NorthEast => [ 1, -1],
+            SouthEast => [ 1,  1],
+            SouthWest => [-1,  1],
+        }
+    }
+}
+impl From<Direction> for (i32, i32) {
+    fn from(d: Direction) -> (i32, i32) {
+        use self::Direction::*;
+        match d {
+            North => ( 0, -1),
+            East  => ( 1,  0),
+            South => ( 0,  1),
+            West  => (-1,  0),
+            NorthWest => (-1, -1),
+            NorthEast => ( 1, -1),
+            SouthEast => ( 1,  1),
+            SouthWest => (-1,  1),
+        }
+    }
+}
