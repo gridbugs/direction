@@ -102,6 +102,32 @@ impl Direction {
     pub fn bitmap(self) -> DirectionBitmap {
         DirectionBitmap::new(self.bitmap_raw())
     }
+
+    pub fn is_cardinal(self) -> bool {
+        match self {
+            Direction::North => true,
+            Direction::NorthEast => false,
+            Direction::East => true,
+            Direction::SouthEast => false,
+            Direction::South => true,
+            Direction::SouthWest => false,
+            Direction::West => true,
+            Direction::NorthWest => false,
+        }
+    }
+
+    pub fn is_ordinal(self) -> bool {
+        match self {
+            Direction::North => false,
+            Direction::NorthEast => true,
+            Direction::East => false,
+            Direction::SouthEast => true,
+            Direction::South => false,
+            Direction::SouthWest => true,
+            Direction::West => false,
+            Direction::NorthWest => true,
+        }
+    }
 }
 
 impl CardinalDirection {
