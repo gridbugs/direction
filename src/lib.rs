@@ -1,8 +1,10 @@
 //! Representations of directions
 extern crate cgmath;
-#[macro_use] extern crate enum_primitive;
+#[macro_use]
+extern crate enum_primitive;
 extern crate serde;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate serde_derive;
 
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign};
 use cgmath::Vector2;
@@ -14,12 +16,9 @@ pub const NUM_ORDINAL_DIRECTIONS: usize = 4;
 pub const ALL_DIRECTIONS_BITMAP_RAW: u8 = 0xff;
 pub const NO_DIRECTIONS_BITMAP_RAW: u8 = 0;
 
-pub const ALL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
-    raw: ALL_DIRECTIONS_BITMAP_RAW,
-};
-pub const NO_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
-    raw: NO_DIRECTIONS_BITMAP_RAW,
-};
+pub const ALL_DIRECTIONS_BITMAP: DirectionBitmap =
+    DirectionBitmap { raw: ALL_DIRECTIONS_BITMAP_RAW };
+pub const NO_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap { raw: NO_DIRECTIONS_BITMAP_RAW };
 
 enum_from_primitive! {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -325,8 +324,18 @@ macro_rules! make_subdirection_iter {
 
 // IntoIter implementations for iterating over a subset of directions. E.g.:
 // for direction in DirectionsCardinal { ... }
-make_subdirection_iter!{DirectionsCardinal, CardinalDirections, DirectionCardinalIter, CardinalDirectionIter}
-make_subdirection_iter!{DirectionsOrdinal, OrdinalDirections, DirectionOrdinalIter, OrdinalDirectionIter}
+make_subdirection_iter!{
+    DirectionsCardinal,
+    CardinalDirections,
+    DirectionCardinalIter,
+    CardinalDirectionIter
+}
+make_subdirection_iter!{
+    DirectionsOrdinal,
+    OrdinalDirections,
+    DirectionOrdinalIter,
+    OrdinalDirectionIter
+}
 
 impl From<Direction> for Vector2<i32> {
     fn from(direction: Direction) -> Self {
@@ -354,9 +363,7 @@ pub struct DirectionBitmap {
 
 impl DirectionBitmap {
     pub fn new(raw: u8) -> Self {
-        Self {
-            raw
-        }
+        Self { raw }
     }
 
     pub fn empty() -> Self {
@@ -412,10 +419,10 @@ impl From<CardinalDirection> for [i32; 2] {
     fn from(c: CardinalDirection) -> [i32; 2] {
         use self::CardinalDirection::*;
         match c {
-            North => [ 0, -1],
-            East  => [ 1,  0],
-            South => [ 0,  1],
-            West  => [-1,  0],
+            North => [0, -1],
+            East => [1, 0],
+            South => [0, 1],
+            West => [-1, 0],
         }
     }
 }
@@ -423,10 +430,10 @@ impl From<CardinalDirection> for (i32, i32) {
     fn from(c: CardinalDirection) -> (i32, i32) {
         use self::CardinalDirection::*;
         match c {
-            North => ( 0, -1),
-            East  => ( 1,  0),
-            South => ( 0,  1),
-            West  => (-1,  0),
+            North => (0, -1),
+            East => (1, 0),
+            South => (0, 1),
+            West => (-1, 0),
         }
     }
 }
@@ -436,9 +443,9 @@ impl From<OrdinalDirection> for [i32; 2] {
         use self::OrdinalDirection::*;
         match o {
             NorthWest => [-1, -1],
-            NorthEast => [ 1, -1],
-            SouthEast => [ 1,  1],
-            SouthWest => [-1,  1],
+            NorthEast => [1, -1],
+            SouthEast => [1, 1],
+            SouthWest => [-1, 1],
         }
     }
 }
@@ -447,9 +454,9 @@ impl From<OrdinalDirection> for (i32, i32) {
         use self::OrdinalDirection::*;
         match o {
             NorthWest => (-1, -1),
-            NorthEast => ( 1, -1),
-            SouthEast => ( 1,  1),
-            SouthWest => (-1,  1),
+            NorthEast => (1, -1),
+            SouthEast => (1, 1),
+            SouthWest => (-1, 1),
         }
     }
 }
@@ -458,14 +465,14 @@ impl From<Direction> for [i32; 2] {
     fn from(d: Direction) -> [i32; 2] {
         use self::Direction::*;
         match d {
-            North => [ 0, -1],
-            East  => [ 1,  0],
-            South => [ 0,  1],
-            West  => [-1,  0],
+            North => [0, -1],
+            East => [1, 0],
+            South => [0, 1],
+            West => [-1, 0],
             NorthWest => [-1, -1],
-            NorthEast => [ 1, -1],
-            SouthEast => [ 1,  1],
-            SouthWest => [-1,  1],
+            NorthEast => [1, -1],
+            SouthEast => [1, 1],
+            SouthWest => [-1, 1],
         }
     }
 }
@@ -473,14 +480,14 @@ impl From<Direction> for (i32, i32) {
     fn from(d: Direction) -> (i32, i32) {
         use self::Direction::*;
         match d {
-            North => ( 0, -1),
-            East  => ( 1,  0),
-            South => ( 0,  1),
-            West  => (-1,  0),
+            North => (0, -1),
+            East => (1, 0),
+            South => (0, 1),
+            West => (-1, 0),
             NorthWest => (-1, -1),
-            NorthEast => ( 1, -1),
-            SouthEast => ( 1,  1),
-            SouthWest => (-1,  1),
+            NorthEast => (1, -1),
+            SouthEast => (1, 1),
+            SouthWest => (-1, 1),
         }
     }
 }
