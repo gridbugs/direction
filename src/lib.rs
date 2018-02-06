@@ -54,6 +54,12 @@ pub enum OrdinalDirection {
 }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum DirectionType {
+    Cardinal(CardinalDirection),
+    Ordinal(OrdinalDirection),
+}
+
 impl Direction {
     pub fn opposite(self) -> Direction {
         match self {
@@ -125,6 +131,19 @@ impl Direction {
             Direction::SouthWest => true,
             Direction::West => false,
             Direction::NorthWest => true,
+        }
+    }
+
+    pub fn typ(self) -> DirectionType {
+        match self {
+            Direction::North => DirectionType::Cardinal(CardinalDirection::North),
+            Direction::NorthEast => DirectionType::Ordinal(OrdinalDirection::NorthEast),
+            Direction::East => DirectionType::Cardinal(CardinalDirection::East),
+            Direction::SouthEast => DirectionType::Ordinal(OrdinalDirection::SouthEast),
+            Direction::South => DirectionType::Cardinal(CardinalDirection::South),
+            Direction::SouthWest => DirectionType::Ordinal(OrdinalDirection::SouthWest),
+            Direction::West => DirectionType::Cardinal(CardinalDirection::West),
+            Direction::NorthWest => DirectionType::Ordinal(OrdinalDirection::NorthWest),
         }
     }
 }
