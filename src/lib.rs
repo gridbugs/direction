@@ -1,5 +1,6 @@
 //! Representations of directions
 extern crate cgmath;
+extern crate grid_2d;
 #[macro_use]
 extern crate enum_primitive;
 extern crate serde;
@@ -8,6 +9,7 @@ extern crate serde_derive;
 
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign};
 use cgmath::Vector2;
+use grid_2d::Coord;
 use enum_primitive::FromPrimitive;
 
 pub const NUM_DIRECTIONS: usize = 8;
@@ -87,6 +89,19 @@ impl Direction {
         }
     }
 
+    pub fn coord(self) -> Coord {
+        match self {
+            Direction::North => Coord::new(0, -1),
+            Direction::NorthEast => Coord::new(1, -1),
+            Direction::East => Coord::new(1, 0),
+            Direction::SouthEast => Coord::new(1, 1),
+            Direction::South => Coord::new(0, 1),
+            Direction::SouthWest => Coord::new(-1, 1),
+            Direction::West => Coord::new(-1, 0),
+            Direction::NorthWest => Coord::new(-1, -1),
+        }
+    }
+
     pub fn left90(self) -> Direction {
         match self {
             Direction::North => Direction::West,
@@ -97,6 +112,19 @@ impl Direction {
             Direction::SouthWest => Direction::SouthEast,
             Direction::West => Direction::South,
             Direction::NorthWest => Direction::SouthWest,
+        }
+    }
+
+    pub fn right90(self) -> Direction {
+        match self {
+            Direction::North => Direction::East,
+            Direction::NorthEast => Direction::SouthEast,
+            Direction::East => Direction::South,
+            Direction::SouthEast => Direction::SouthWest,
+            Direction::South => Direction::West,
+            Direction::SouthWest => Direction::NorthWest,
+            Direction::West => Direction::North,
+            Direction::NorthWest => Direction::NorthEast,
         }
     }
 
@@ -176,12 +204,30 @@ impl CardinalDirection {
         }
     }
 
+    pub fn coord(self) -> Coord {
+        match self {
+            CardinalDirection::North => Coord::new(0, -1),
+            CardinalDirection::East => Coord::new(1, 0),
+            CardinalDirection::South => Coord::new(0, 1),
+            CardinalDirection::West => Coord::new(-1, 0),
+        }
+    }
+
     pub fn left90(self) -> CardinalDirection {
         match self {
             CardinalDirection::North => CardinalDirection::West,
             CardinalDirection::East => CardinalDirection::North,
             CardinalDirection::South => CardinalDirection::East,
             CardinalDirection::West => CardinalDirection::South,
+        }
+    }
+
+    pub fn right90(self) -> CardinalDirection {
+        match self {
+            CardinalDirection::North => CardinalDirection::East,
+            CardinalDirection::East => CardinalDirection::South,
+            CardinalDirection::South => CardinalDirection::West,
+            CardinalDirection::West => CardinalDirection::North,
         }
     }
 }
@@ -211,6 +257,15 @@ impl OrdinalDirection {
             OrdinalDirection::SouthEast => Vector2::new(1, 1),
             OrdinalDirection::SouthWest => Vector2::new(-1, 1),
             OrdinalDirection::NorthWest => Vector2::new(-1, -1),
+        }
+    }
+
+    pub fn coord(self) -> Coord {
+        match self {
+            OrdinalDirection::NorthEast => Coord::new(1, -1),
+            OrdinalDirection::SouthEast => Coord::new(1, 1),
+            OrdinalDirection::SouthWest => Coord::new(-1, 1),
+            OrdinalDirection::NorthWest => Coord::new(-1, -1),
         }
     }
 
