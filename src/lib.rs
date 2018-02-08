@@ -449,9 +449,9 @@ impl OrdinalDirection {
         use self::CardinalDirection::*;
         match self {
             NorthEast => (North, East),
-            SouthEast => (South, East),
+            SouthEast => (East, South),
             SouthWest => (South, West),
-            NorthWest => (North, West),
+            NorthWest => (West, North),
         }
     }
 
