@@ -128,6 +128,58 @@ impl Direction {
         }
     }
 
+    pub fn left45(self) -> Direction {
+        match self {
+            Direction::North => Direction::NorthWest,
+            Direction::NorthEast => Direction::North,
+            Direction::East => Direction::NorthEast,
+            Direction::SouthEast => Direction::East,
+            Direction::South => Direction::SouthEast,
+            Direction::SouthWest => Direction::South,
+            Direction::West => Direction::SouthWest,
+            Direction::NorthWest => Direction::West,
+        }
+    }
+
+    pub fn right45(self) -> Direction {
+        match self {
+            Direction::North => Direction::NorthEast,
+            Direction::NorthEast => Direction::East,
+            Direction::East => Direction::SouthEast,
+            Direction::SouthEast => Direction::South,
+            Direction::South => Direction::SouthWest,
+            Direction::SouthWest => Direction::West,
+            Direction::West => Direction::NorthWest,
+            Direction::NorthWest => Direction::North,
+        }
+    }
+
+    pub fn left135(self) -> Direction {
+        match self {
+            Direction::North => Direction::SouthWest,
+            Direction::NorthEast => Direction::West,
+            Direction::East => Direction::NorthWest,
+            Direction::SouthEast => Direction::North,
+            Direction::South => Direction::NorthEast,
+            Direction::SouthWest => Direction::East,
+            Direction::West => Direction::SouthEast,
+            Direction::NorthWest => Direction::South,
+        }
+    }
+
+    pub fn right135(self) -> Direction {
+        match self {
+            Direction::North => Direction::SouthEast,
+            Direction::NorthEast => Direction::South,
+            Direction::East => Direction::SouthWest,
+            Direction::SouthEast => Direction::West,
+            Direction::South => Direction::NorthWest,
+            Direction::SouthWest => Direction::North,
+            Direction::West => Direction::NorthEast,
+            Direction::NorthWest => Direction::East,
+        }
+    }
+
     pub fn bitmap_raw(self) -> u8 {
         1 << self as usize
     }
@@ -230,6 +282,42 @@ impl CardinalDirection {
             CardinalDirection::West => CardinalDirection::North,
         }
     }
+
+    pub fn left45(self) -> OrdinalDirection {
+        match self {
+            CardinalDirection::North => OrdinalDirection::NorthWest,
+            CardinalDirection::East => OrdinalDirection::NorthEast,
+            CardinalDirection::South => OrdinalDirection::SouthEast,
+            CardinalDirection::West => OrdinalDirection::SouthWest,
+        }
+    }
+
+    pub fn right45(self) -> OrdinalDirection {
+        match self {
+            CardinalDirection::North => OrdinalDirection::NorthEast,
+            CardinalDirection::East => OrdinalDirection::SouthEast,
+            CardinalDirection::South => OrdinalDirection::SouthWest,
+            CardinalDirection::West => OrdinalDirection::NorthWest,
+        }
+    }
+
+    pub fn left135(self) -> OrdinalDirection {
+        match self {
+            CardinalDirection::North => OrdinalDirection::SouthWest,
+            CardinalDirection::East => OrdinalDirection::NorthWest,
+            CardinalDirection::South => OrdinalDirection::NorthEast,
+            CardinalDirection::West => OrdinalDirection::SouthEast,
+        }
+    }
+
+    pub fn right135(self) -> OrdinalDirection {
+        match self {
+            CardinalDirection::North => OrdinalDirection::SouthEast,
+            CardinalDirection::East => OrdinalDirection::SouthWest,
+            CardinalDirection::South => OrdinalDirection::NorthWest,
+            CardinalDirection::West => OrdinalDirection::NorthEast,
+        }
+    }
 }
 
 impl OrdinalDirection {
@@ -275,6 +363,51 @@ impl OrdinalDirection {
             OrdinalDirection::SouthEast => OrdinalDirection::NorthEast,
             OrdinalDirection::SouthWest => OrdinalDirection::SouthEast,
             OrdinalDirection::NorthWest => OrdinalDirection::SouthWest,
+        }
+    }
+
+    pub fn right90(self) -> OrdinalDirection {
+        match self {
+            OrdinalDirection::NorthEast => OrdinalDirection::SouthEast,
+            OrdinalDirection::SouthEast => OrdinalDirection::SouthWest,
+            OrdinalDirection::SouthWest => OrdinalDirection::NorthWest,
+            OrdinalDirection::NorthWest => OrdinalDirection::NorthEast,
+        }
+    }
+
+    pub fn left45(self) -> CardinalDirection {
+        match self {
+            OrdinalDirection::NorthEast => CardinalDirection::North,
+            OrdinalDirection::SouthEast => CardinalDirection::East,
+            OrdinalDirection::SouthWest => CardinalDirection::South,
+            OrdinalDirection::NorthWest => CardinalDirection::West,
+        }
+    }
+
+    pub fn right45(self) -> CardinalDirection {
+        match self {
+            OrdinalDirection::NorthEast => CardinalDirection::East,
+            OrdinalDirection::SouthEast => CardinalDirection::South,
+            OrdinalDirection::SouthWest => CardinalDirection::West,
+            OrdinalDirection::NorthWest => CardinalDirection::North,
+        }
+    }
+
+    pub fn left135(self) -> CardinalDirection {
+        match self {
+            OrdinalDirection::NorthEast => CardinalDirection::West,
+            OrdinalDirection::SouthEast => CardinalDirection::North,
+            OrdinalDirection::SouthWest => CardinalDirection::East,
+            OrdinalDirection::NorthWest => CardinalDirection::South,
+        }
+    }
+
+    pub fn right135(self) -> CardinalDirection {
+        match self {
+            OrdinalDirection::NorthEast => CardinalDirection::South,
+            OrdinalDirection::SouthEast => CardinalDirection::West,
+            OrdinalDirection::SouthWest => CardinalDirection::North,
+            OrdinalDirection::NorthWest => CardinalDirection::East,
         }
     }
 
