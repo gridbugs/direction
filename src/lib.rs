@@ -226,6 +226,26 @@ impl Direction {
             Direction::NorthWest => DirectionType::Ordinal(OrdinalDirection::NorthWest),
         }
     }
+
+    pub fn cardinal(self) -> Option<CardinalDirection> {
+        match self {
+            Direction::North => Some(CardinalDirection::North),
+            Direction::East => Some(CardinalDirection::East),
+            Direction::South => Some(CardinalDirection::South),
+            Direction::West => Some(CardinalDirection::West),
+            _ => None,
+        }
+    }
+
+    pub fn ordinal(self) -> Option<OrdinalDirection> {
+        match self {
+            Direction::NorthEast => Some(OrdinalDirection::NorthEast),
+            Direction::SouthEast => Some(OrdinalDirection::SouthEast),
+            Direction::SouthWest => Some(OrdinalDirection::SouthWest),
+            Direction::NorthWest => Some(OrdinalDirection::NorthWest),
+            _ => None,
+        }
+    }
 }
 
 impl CardinalDirection {
