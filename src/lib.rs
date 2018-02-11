@@ -9,7 +9,7 @@ extern crate serde_derive;
 
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign};
 use cgmath::Vector2;
-use grid_2d::Coord;
+pub use grid_2d::Coord;
 use enum_primitive::FromPrimitive;
 
 pub const NUM_DIRECTIONS: usize = 8;
