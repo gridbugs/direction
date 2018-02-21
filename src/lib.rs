@@ -495,6 +495,7 @@ impl From<OrdinalDirection> for Direction {
 
 macro_rules! make_direction_iter {
     ($col_name:ident, $iter_name:ident, $type:ident) => {
+        #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
         /// Iterator over all directions of the respectively-named type of direction
         pub struct $iter_name(u8);
         impl Iterator for $iter_name {
@@ -507,7 +508,7 @@ macro_rules! make_direction_iter {
         }
 
         /// Represents a collection of the respectively-named type of direction
-        #[derive(Clone, Copy)]
+        #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
         pub struct $col_name;
         impl IntoIterator for $col_name {
             type Item = $type;
@@ -527,6 +528,7 @@ make_direction_iter!{OrdinalDirections, OrdinalDirectionIter, OrdinalDirection}
 
 macro_rules! make_subdirection_iter {
     ($col_name:ident, $backing_col_name:ident, $iter_name:ident, $backing_iter_name:ident) => {
+        #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
         /// Iterator over a particular collection of `Direction`s
         pub struct $iter_name($backing_iter_name);
         impl Iterator for $iter_name {
@@ -536,7 +538,7 @@ macro_rules! make_subdirection_iter {
             }
         }
 
-        #[derive(Clone, Copy)]
+        #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
         /// Represents a particular collection of `Direction`s
         pub struct $col_name;
         impl IntoIterator for $col_name {
