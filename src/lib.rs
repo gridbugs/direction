@@ -63,6 +63,20 @@ pub enum DirectionType {
 }
 
 impl Direction {
+    pub fn from_unit_coord(coord: Coord) -> Self {
+        match coord {
+            Coord { x: 1, y: 0 } => Direction::East,
+            Coord { x: -1, y: 0 } => Direction::West,
+            Coord { x: 0, y: 1 } => Direction::South,
+            Coord { x: 0, y: -1 } => Direction::North,
+            Coord { x: 1, y: 1 } => Direction::SouthEast,
+            Coord { x: 1, y: -1 } => Direction::NorthEast,
+            Coord { x: -1, y: 1 } => Direction::SouthWest,
+            Coord { x: -1, y: -1 } => Direction::NorthWest,
+            _ => panic!("Unexpected coord: {:?}", coord),
+        }
+    }
+
     pub fn opposite(self) -> Direction {
         match self {
             Direction::North => Direction::South,
@@ -249,6 +263,16 @@ impl Direction {
 }
 
 impl CardinalDirection {
+    pub fn from_unit_coord(coord: Coord) -> Self {
+        match coord {
+            Coord { x: 1, y: 0 } => CardinalDirection::East,
+            Coord { x: -1, y: 0 } => CardinalDirection::West,
+            Coord { x: 0, y: 1 } => CardinalDirection::South,
+            Coord { x: 0, y: -1 } => CardinalDirection::North,
+            _ => panic!("Unexpected coord: {:?}", coord),
+        }
+    }
+
     pub fn direction(self) -> Direction {
         match self {
             CardinalDirection::North => Direction::North,
@@ -341,6 +365,16 @@ impl CardinalDirection {
 }
 
 impl OrdinalDirection {
+    pub fn from_unit_coord(coord: Coord) -> Self {
+        match coord {
+            Coord { x: 1, y: 1 } => OrdinalDirection::SouthEast,
+            Coord { x: 1, y: -1 } => OrdinalDirection::NorthEast,
+            Coord { x: -1, y: 1 } => OrdinalDirection::SouthWest,
+            Coord { x: -1, y: -1 } => OrdinalDirection::NorthWest,
+            _ => panic!("Unexpected coord: {:?}", coord),
+        }
+    }
+
     pub fn direction(self) -> Direction {
         match self {
             OrdinalDirection::NorthEast => Direction::NorthEast,
