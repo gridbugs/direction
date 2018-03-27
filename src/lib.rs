@@ -1,16 +1,12 @@
 //! Representations of directions
-extern crate cgmath;
 extern crate grid_2d;
-#[macro_use]
-extern crate enum_primitive;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 
 use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign};
-use cgmath::Vector2;
+use std::mem;
 pub use grid_2d::Coord;
-use enum_primitive::FromPrimitive;
 
 pub const NUM_DIRECTIONS: usize = 8;
 pub const NUM_CARDINAL_DIRECTIONS: usize = 4;
@@ -22,8 +18,8 @@ pub const ALL_DIRECTIONS_BITMAP: DirectionBitmap =
     DirectionBitmap { raw: ALL_DIRECTIONS_BITMAP_RAW };
 pub const NO_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap { raw: NO_DIRECTIONS_BITMAP_RAW };
 
-enum_from_primitive! {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[repr(u8)]
 pub enum Direction {
     North,
     NorthEast,
@@ -34,26 +30,23 @@ pub enum Direction {
     West,
     NorthWest,
 }
-}
 
-enum_from_primitive! {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[repr(u8)]
 pub enum CardinalDirection {
     North,
     East,
     South,
     West
 }
-}
 
-enum_from_primitive! {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[repr(u8)]
 pub enum OrdinalDirection {
     NorthEast,
     SouthEast,
     SouthWest,
     NorthWest,
-}
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -87,19 +80,6 @@ impl Direction {
             Direction::SouthWest => Direction::NorthEast,
             Direction::West => Direction::East,
             Direction::NorthWest => Direction::SouthEast,
-        }
-    }
-
-    pub fn vector(self) -> Vector2<i32> {
-        match self {
-            Direction::North => Vector2::new(0, -1),
-            Direction::NorthEast => Vector2::new(1, -1),
-            Direction::East => Vector2::new(1, 0),
-            Direction::SouthEast => Vector2::new(1, 1),
-            Direction::South => Vector2::new(0, 1),
-            Direction::SouthWest => Vector2::new(-1, 1),
-            Direction::West => Vector2::new(-1, 0),
-            Direction::NorthWest => Vector2::new(-1, -1),
         }
     }
 
@@ -291,15 +271,6 @@ impl CardinalDirection {
         }
     }
 
-    pub fn vector(self) -> Vector2<i32> {
-        match self {
-            CardinalDirection::North => Vector2::new(0, -1),
-            CardinalDirection::East => Vector2::new(1, 0),
-            CardinalDirection::South => Vector2::new(0, 1),
-            CardinalDirection::West => Vector2::new(-1, 0),
-        }
-    }
-
     pub fn coord(self) -> Coord {
         match self {
             CardinalDirection::North => Coord::new(0, -1),
@@ -390,15 +361,6 @@ impl OrdinalDirection {
             OrdinalDirection::SouthEast => OrdinalDirection::NorthWest,
             OrdinalDirection::SouthWest => OrdinalDirection::NorthEast,
             OrdinalDirection::NorthWest => OrdinalDirection::SouthEast,
-        }
-    }
-
-    pub fn vector(self) -> Vector2<i32> {
-        match self {
-            OrdinalDirection::NorthEast => Vector2::new(1, -1),
-            OrdinalDirection::SouthEast => Vector2::new(1, 1),
-            OrdinalDirection::SouthWest => Vector2::new(-1, 1),
-            OrdinalDirection::NorthWest => Vector2::new(-1, -1),
         }
     }
 
@@ -535,7 +497,7 @@ macro_rules! make_direction_iter {
         impl Iterator for $iter_name {
             type Item = $type;
             fn next(&mut self) -> Option<Self::Item> {
-                let d = Self::Item::from_u8(self.0);
+                let d = unsafe { mem::transmute(self.0) };
                 self.0 += 1;
                 d
             }
@@ -598,24 +560,6 @@ make_subdirection_iter!{
     OrdinalDirections,
     DirectionOrdinalIter,
     OrdinalDirectionIter
-}
-
-impl From<Direction> for Vector2<i32> {
-    fn from(direction: Direction) -> Self {
-        direction.vector()
-    }
-}
-
-impl From<CardinalDirection> for Vector2<i32> {
-    fn from(direction: CardinalDirection) -> Self {
-        direction.vector()
-    }
-}
-
-impl From<OrdinalDirection> for Vector2<i32> {
-    fn from(direction: OrdinalDirection) -> Self {
-        direction.vector()
-    }
 }
 
 /// Set of directions implemented as a bitmap
