@@ -1,12 +1,12 @@
 //! Representations of directions
 extern crate grid_2d;
-extern crate serde;
+#[cfg(feature = "serde")]
 #[macro_use]
-extern crate serde_derive;
+extern crate serde;
 
-use std::ops::{BitOr, BitOrAssign, BitAnd, BitAndAssign};
-use std::mem;
 pub use grid_2d::Coord;
+use std::mem;
+use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign};
 
 pub const NUM_DIRECTIONS: usize = 8;
 pub const NUM_CARDINAL_DIRECTIONS: usize = 4;
@@ -14,11 +14,15 @@ pub const NUM_ORDINAL_DIRECTIONS: usize = 4;
 pub const ALL_DIRECTIONS_BITMAP_RAW: u8 = 0xff;
 pub const NO_DIRECTIONS_BITMAP_RAW: u8 = 0;
 
-pub const ALL_DIRECTIONS_BITMAP: DirectionBitmap =
-    DirectionBitmap { raw: ALL_DIRECTIONS_BITMAP_RAW };
-pub const NO_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap { raw: NO_DIRECTIONS_BITMAP_RAW };
+pub const ALL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
+    raw: ALL_DIRECTIONS_BITMAP_RAW,
+};
+pub const NO_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
+    raw: NO_DIRECTIONS_BITMAP_RAW,
+};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum Direction {
     North,
@@ -31,16 +35,18 @@ pub enum Direction {
     NorthWest,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum CardinalDirection {
     North,
     East,
     South,
-    West
+    West,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum OrdinalDirection {
     NorthEast,
@@ -49,7 +55,8 @@ pub enum OrdinalDirection {
     NorthWest,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum DirectionType {
     Cardinal(CardinalDirection),
     Ordinal(OrdinalDirection),
@@ -429,40 +436,32 @@ impl OrdinalDirection {
 
     pub fn from_cardinals(a: CardinalDirection, b: CardinalDirection) -> Option<Self> {
         match a {
-            CardinalDirection::North => {
-                match b {
-                    CardinalDirection::East => return Some(OrdinalDirection::NorthEast),
-                    CardinalDirection::West => return Some(OrdinalDirection::NorthWest),
-                    _ => return None,
-                }
-            }
-            CardinalDirection::East => {
-                match b {
-                    CardinalDirection::North => return Some(OrdinalDirection::NorthEast),
-                    CardinalDirection::South => return Some(OrdinalDirection::SouthEast),
-                    _ => return None,
-                }
-            }
-            CardinalDirection::South => {
-                match b {
-                    CardinalDirection::East => return Some(OrdinalDirection::SouthEast),
-                    CardinalDirection::West => return Some(OrdinalDirection::SouthWest),
-                    _ => return None,
-                }
-            }
-            CardinalDirection::West => {
-                match b {
-                    CardinalDirection::North => return Some(OrdinalDirection::NorthWest),
-                    CardinalDirection::South => return Some(OrdinalDirection::SouthWest),
-                    _ => return None,
-                }
-            }
+            CardinalDirection::North => match b {
+                CardinalDirection::East => return Some(OrdinalDirection::NorthEast),
+                CardinalDirection::West => return Some(OrdinalDirection::NorthWest),
+                _ => return None,
+            },
+            CardinalDirection::East => match b {
+                CardinalDirection::North => return Some(OrdinalDirection::NorthEast),
+                CardinalDirection::South => return Some(OrdinalDirection::SouthEast),
+                _ => return None,
+            },
+            CardinalDirection::South => match b {
+                CardinalDirection::East => return Some(OrdinalDirection::SouthEast),
+                CardinalDirection::West => return Some(OrdinalDirection::SouthWest),
+                _ => return None,
+            },
+            CardinalDirection::West => match b {
+                CardinalDirection::North => return Some(OrdinalDirection::NorthWest),
+                CardinalDirection::South => return Some(OrdinalDirection::SouthWest),
+                _ => return None,
+            },
         }
     }
 
     pub fn to_cardinals(self) -> (CardinalDirection, CardinalDirection) {
-        use self::OrdinalDirection::*;
         use self::CardinalDirection::*;
+        use self::OrdinalDirection::*;
         match self {
             NorthEast => (North, East),
             SouthEast => (East, South),
@@ -491,7 +490,8 @@ impl From<OrdinalDirection> for Direction {
 
 macro_rules! make_direction_iter {
     ($col_name:ident, $iter_name:ident, $type:ident) => {
-        #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[derive(Debug, Clone, Copy)]
         /// Iterator over all directions of the respectively-named type of direction
         pub struct $iter_name(u8);
         impl Iterator for $iter_name {
@@ -504,7 +504,8 @@ macro_rules! make_direction_iter {
         }
 
         /// Represents a collection of the respectively-named type of direction
-        #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[derive(Debug, Clone, Copy)]
         pub struct $col_name;
         impl IntoIterator for $col_name {
             type Item = $type;
@@ -513,7 +514,7 @@ macro_rules! make_direction_iter {
                 $iter_name(0)
             }
         }
-    }
+    };
 }
 
 // IntoIter implementations for iterating over all directions of a type. E.g.:
@@ -524,7 +525,8 @@ make_direction_iter!{OrdinalDirections, OrdinalDirectionIter, OrdinalDirection}
 
 macro_rules! make_subdirection_iter {
     ($col_name:ident, $backing_col_name:ident, $iter_name:ident, $backing_iter_name:ident) => {
-        #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[derive(Debug, Clone, Copy)]
         /// Iterator over a particular collection of `Direction`s
         pub struct $iter_name($backing_iter_name);
         impl Iterator for $iter_name {
@@ -534,7 +536,8 @@ macro_rules! make_subdirection_iter {
             }
         }
 
-        #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[derive(Debug, Clone, Copy)]
         /// Represents a particular collection of `Direction`s
         pub struct $col_name;
         impl IntoIterator for $col_name {
@@ -544,7 +547,7 @@ macro_rules! make_subdirection_iter {
                 $iter_name($backing_col_name.into_iter())
             }
         }
-    }
+    };
 }
 
 // IntoIter implementations for iterating over a subset of directions. E.g.:
@@ -563,7 +566,8 @@ make_subdirection_iter!{
 }
 
 /// Set of directions implemented as a bitmap
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DirectionBitmap {
     pub raw: u8,
 }
