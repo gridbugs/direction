@@ -1,12 +1,13 @@
 //! Representations of directions
-extern crate grid_2d;
+extern crate coord_2d;
 #[cfg(feature = "serde")]
 #[macro_use]
 extern crate serde;
 
-pub use grid_2d::Coord;
+pub use coord_2d::Coord;
 use std::mem;
-use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign};
+use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Range};
+use std::slice;
 
 pub const NUM_DIRECTIONS: usize = 8;
 pub const NUM_CARDINAL_DIRECTIONS: usize = 4;
@@ -489,17 +490,15 @@ impl From<OrdinalDirection> for Direction {
 }
 
 macro_rules! make_direction_iter {
-    ($col_name:ident, $iter_name:ident, $type:ident) => {
+    ($col_name:ident, $iter_name:ident, $type:ident, $count:expr) => {
         #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-        #[derive(Debug, Clone, Copy)]
+        #[derive(Debug, Clone)]
         /// Iterator over all directions of the respectively-named type of direction
-        pub struct $iter_name(u8);
+        pub struct $iter_name(Range<u8>);
         impl Iterator for $iter_name {
             type Item = $type;
             fn next(&mut self) -> Option<Self::Item> {
-                let d = unsafe { mem::transmute(self.0) };
-                self.0 += 1;
-                d
+                self.0.next().map(|n| unsafe { mem::transmute(n) })
             }
         }
 
@@ -511,7 +510,7 @@ macro_rules! make_direction_iter {
             type Item = $type;
             type IntoIter = $iter_name;
             fn into_iter(self) -> Self::IntoIter {
-                $iter_name(0)
+                $iter_name(0..$count as u8)
             }
         }
     };
@@ -519,14 +518,14 @@ macro_rules! make_direction_iter {
 
 // IntoIter implementations for iterating over all directions of a type. E.g.:
 // for direction in CardinalDirections { ... }
-make_direction_iter!{Directions, DirectionIter, Direction}
-make_direction_iter!{CardinalDirections, CardinalDirectionIter, CardinalDirection}
-make_direction_iter!{OrdinalDirections, OrdinalDirectionIter, OrdinalDirection}
+make_direction_iter!{Directions, DirectionIter, Direction, NUM_DIRECTIONS}
+make_direction_iter!{CardinalDirections, CardinalDirectionIter, CardinalDirection, NUM_CARDINAL_DIRECTIONS}
+make_direction_iter!{OrdinalDirections, OrdinalDirectionIter, OrdinalDirection, NUM_ORDINAL_DIRECTIONS}
 
 macro_rules! make_subdirection_iter {
     ($col_name:ident, $backing_col_name:ident, $iter_name:ident, $backing_iter_name:ident) => {
         #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-        #[derive(Debug, Clone, Copy)]
+        #[derive(Debug, Clone)]
         /// Iterator over a particular collection of `Direction`s
         pub struct $iter_name($backing_iter_name);
         impl Iterator for $iter_name {
@@ -700,5 +699,90 @@ impl From<Direction> for (i32, i32) {
             SouthEast => (1, 1),
             SouthWest => (-1, 1),
         }
+    }
+}
+
+pub type DirectionTableIter<'a, T> = slice::Iter<'a, T>;
+pub type DirectionTableIterMut<'a, T> = slice::IterMut<'a, T>;
+
+macro_rules! make_direction_table {
+    ($table_type:ident, $direction_type:ident, $direction_iter:ident, $count:expr) => {
+        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+        pub struct $table_type<T> {
+            values: [T; $count],
+        }
+        impl<T> $table_type<T> {
+            unsafe fn new_uninitialized() -> Self {
+                mem::uninitialized()
+            }
+            pub fn new_fn<F: FnMut($direction_type) -> T>(mut f: F) -> Self {
+                let mut table = unsafe { Self::new_uninitialized() };
+                for direction in $direction_iter {
+                    table.set(direction, f(direction));
+                }
+                table
+            }
+            pub fn set(&mut self, direction: $direction_type, value: T) {
+                self.values[direction as usize] = value;
+            }
+            pub fn get(&self, direction: $direction_type) -> &T {
+                &self.values[direction as usize]
+            }
+            pub fn get_mut(&mut self, direction: $direction_type) -> &mut T {
+                &mut self.values[direction as usize]
+            }
+            pub fn iter(&self) -> DirectionTableIter<T> {
+                self.values.iter()
+            }
+            pub fn iter_mut(&mut self) -> DirectionTableIterMut<T> {
+                self.values.iter_mut()
+            }
+        }
+        impl<T: Clone> $table_type<T> {
+            pub fn new_clone(value: T) -> Self {
+                let mut table = unsafe { Self::new_uninitialized() };
+                for direction in $direction_iter {
+                    table.set(direction, value.clone());
+                }
+                table
+            }
+        }
+        impl<T: Default> $table_type<T> {
+            pub fn new_default() -> Self {
+                let mut table = unsafe { Self::new_uninitialized() };
+                for direction in $direction_iter {
+                    table.set(direction, Default::default());
+                }
+                table
+            }
+        }
+    };
+}
+
+make_direction_table!(DirectionTable, Direction, Directions, NUM_DIRECTIONS);
+make_direction_table!(
+    CardinalDirectionTable,
+    CardinalDirection,
+    CardinalDirections,
+    NUM_CARDINAL_DIRECTIONS
+);
+make_direction_table!(
+    OrdinalDirectionTable,
+    OrdinalDirection,
+    OrdinalDirections,
+    NUM_ORDINAL_DIRECTIONS
+);
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn iteration() {
+        use Direction::*;
+        assert_eq!(
+            CardinalDirections.into_iter().collect::<Vec<_>>(),
+            vec![North, East, South, West]
+        )
     }
 }
