@@ -803,10 +803,28 @@ mod test {
     use super::*;
     #[test]
     fn iteration() {
-        use Direction::*;
-        assert_eq!(
-            CardinalDirections.into_iter().collect::<Vec<_>>(),
-            vec![North, East, South, West]
-        )
+        {
+            use CardinalDirection::*;
+            assert_eq!(
+                CardinalDirections.into_iter().collect::<Vec<_>>(),
+                vec![North, East, South, West]
+            )
+        }
+        {
+            use OrdinalDirection::*;
+            assert_eq!(
+                OrdinalDirections.into_iter().collect::<Vec<_>>(),
+                vec![NorthEast, SouthEast, SouthWest, NorthWest]
+            )
+        }
+        {
+            use Direction::*;
+            assert_eq!(
+                Directions.into_iter().collect::<Vec<_>>(),
+                vec![
+                    North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,
+                ]
+            )
+        }
     }
 }
