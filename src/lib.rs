@@ -14,12 +14,25 @@ pub const NUM_CARDINAL_DIRECTIONS: usize = 4;
 pub const NUM_ORDINAL_DIRECTIONS: usize = 4;
 pub const ALL_DIRECTIONS_BITMAP_RAW: u8 = 0xff;
 pub const NO_DIRECTIONS_BITMAP_RAW: u8 = 0;
+pub const ALL_CARDINAL_DIRECTION_BITMAP_RAW: u8 =
+    (1 << Direction::North as usize) | (1 << Direction::East as usize)
+        | (1 << Direction::South as usize) | (1 << Direction::West as usize);
+
+pub const ALL_ORDINAL_DIRECTION_BITMAP_RAW: u8 =
+    (1 << Direction::NorthEast as usize) | (1 << Direction::SouthEast as usize)
+        | (1 << Direction::SouthWest as usize) | (1 << Direction::NorthWest as usize);
 
 pub const ALL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
     raw: ALL_DIRECTIONS_BITMAP_RAW,
 };
 pub const NO_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
     raw: NO_DIRECTIONS_BITMAP_RAW,
+};
+pub const ALL_CARDINAL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
+    raw: ALL_CARDINAL_DIRECTION_BITMAP_RAW,
+};
+pub const ALL_ORDINAL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
+    raw: ALL_ORDINAL_DIRECTION_BITMAP_RAW,
 };
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -584,12 +597,23 @@ impl DirectionBitmap {
         ALL_DIRECTIONS_BITMAP
     }
 
+    pub fn all_cardinal() -> Self {
+        ALL_CARDINAL_DIRECTIONS_BITMAP
+    }
+    pub fn all_ordinal() -> Self {
+        ALL_ORDINAL_DIRECTIONS_BITMAP
+    }
+
     pub fn has(self, direction: Direction) -> bool {
         self.raw & (1 << direction as usize) != 0
     }
 
     pub fn is_empty(self) -> bool {
-        self.raw == 0
+        self.raw == NO_DIRECTIONS_BITMAP_RAW
+    }
+
+    pub fn is_full(self) -> bool {
+        self.raw == ALL_DIRECTIONS_BITMAP_RAW
     }
 }
 
