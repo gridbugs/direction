@@ -14,13 +14,15 @@ pub const NUM_CARDINAL_DIRECTIONS: usize = 4;
 pub const NUM_ORDINAL_DIRECTIONS: usize = 4;
 pub const ALL_DIRECTIONS_BITMAP_RAW: u8 = 0xff;
 pub const NO_DIRECTIONS_BITMAP_RAW: u8 = 0;
-pub const ALL_CARDINAL_DIRECTION_BITMAP_RAW: u8 =
-    (1 << Direction::North as usize) | (1 << Direction::East as usize)
-        | (1 << Direction::South as usize) | (1 << Direction::West as usize);
+pub const ALL_CARDINAL_DIRECTION_BITMAP_RAW: u8 = (1 << Direction::North as usize)
+    | (1 << Direction::East as usize)
+    | (1 << Direction::South as usize)
+    | (1 << Direction::West as usize);
 
-pub const ALL_ORDINAL_DIRECTION_BITMAP_RAW: u8 =
-    (1 << Direction::NorthEast as usize) | (1 << Direction::SouthEast as usize)
-        | (1 << Direction::SouthWest as usize) | (1 << Direction::NorthWest as usize);
+pub const ALL_ORDINAL_DIRECTION_BITMAP_RAW: u8 = (1 << Direction::NorthEast as usize)
+    | (1 << Direction::SouthEast as usize)
+    | (1 << Direction::SouthWest as usize)
+    | (1 << Direction::NorthWest as usize);
 
 pub const ALL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
     raw: ALL_DIRECTIONS_BITMAP_RAW,
@@ -585,35 +587,43 @@ pub struct DirectionBitmap {
 }
 
 impl DirectionBitmap {
-    pub fn new(raw: u8) -> Self {
+    pub const fn new(raw: u8) -> Self {
         Self { raw }
     }
 
-    pub fn empty() -> Self {
+    pub const fn empty() -> Self {
         NO_DIRECTIONS_BITMAP
     }
 
-    pub fn all() -> Self {
+    pub const fn all() -> Self {
         ALL_DIRECTIONS_BITMAP
     }
 
-    pub fn all_cardinal() -> Self {
+    pub const fn all_cardinal() -> Self {
         ALL_CARDINAL_DIRECTIONS_BITMAP
     }
-    pub fn all_ordinal() -> Self {
+    pub const fn all_ordinal() -> Self {
         ALL_ORDINAL_DIRECTIONS_BITMAP
     }
 
-    pub fn has(self, direction: Direction) -> bool {
+    pub const fn has(self, direction: Direction) -> bool {
         self.raw & (1 << direction as usize) != 0
     }
 
-    pub fn is_empty(self) -> bool {
+    pub const fn is_empty(self) -> bool {
         self.raw == NO_DIRECTIONS_BITMAP_RAW
     }
 
-    pub fn is_full(self) -> bool {
+    pub const fn is_full(self) -> bool {
         self.raw == ALL_DIRECTIONS_BITMAP_RAW
+    }
+
+    pub const fn and(self, rhs: Self) -> Self {
+        Self::new(self.raw & rhs.raw)
+    }
+
+    pub const fn or(self, rhs: Self) -> Self {
+        Self::new(self.raw | rhs.raw)
     }
 }
 
@@ -626,7 +636,7 @@ impl Default for DirectionBitmap {
 impl BitOr for DirectionBitmap {
     type Output = Self;
     fn bitor(self, rhs: Self) -> Self {
-        DirectionBitmap::new(self.raw | rhs.raw)
+        self.or(rhs)
     }
 }
 
@@ -639,7 +649,7 @@ impl BitOrAssign for DirectionBitmap {
 impl BitAnd for DirectionBitmap {
     type Output = Self;
     fn bitand(self, rhs: Self) -> Self {
-        DirectionBitmap::new(self.raw & rhs.raw)
+        self.and(rhs)
     }
 }
 
@@ -747,6 +757,9 @@ macro_rules! make_direction_table {
                 }
                 table
             }
+            pub const fn new_array(values: [T; $count]) -> Self {
+                Self { values }
+            }
             pub fn set(&mut self, direction: $direction_type, value: T) {
                 self.values[direction as usize] = value;
             }
@@ -821,9 +834,7 @@ mod test {
             use Direction::*;
             assert_eq!(
                 Directions.into_iter().collect::<Vec<_>>(),
-                vec![
-                    North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,
-                ]
+                vec![North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,]
             )
         }
     }
