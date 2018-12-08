@@ -742,7 +742,7 @@ pub type DirectionTableIterMut<'a, T> = slice::IterMut<'a, T>;
 macro_rules! make_direction_table {
     ($table_type:ident, $direction_type:ident, $direction_iter:ident, $count:expr) => {
         #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
-        #[derive(Debug, Default, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+        #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
         pub struct $table_type<T> {
             values: [T; $count],
         }
