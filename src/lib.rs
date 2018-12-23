@@ -6,7 +6,7 @@ extern crate serde;
 
 pub use coord_2d::Coord;
 use std::mem;
-use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Range};
+use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Index, IndexMut, Range};
 use std::slice;
 
 pub const NUM_DIRECTIONS: usize = 8;
@@ -792,6 +792,17 @@ macro_rules! make_direction_table {
                     table.set(direction, Default::default());
                 }
                 table
+            }
+        }
+        impl<T> Index<$direction_type> for $table_type<T> {
+            type Output = T;
+            fn index(&self, index: $direction_type) -> &Self::Output {
+                self.values.index(index as usize)
+            }
+        }
+        impl<T> IndexMut<$direction_type> for $table_type<T> {
+            fn index_mut(&mut self, index: $direction_type) -> &mut Self::Output {
+                self.values.index_mut(index as usize)
             }
         }
     };
