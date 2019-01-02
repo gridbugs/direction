@@ -9,6 +9,9 @@ repository = "https://github.com/stevebob/direction.git"
 homepage = "https://github.com/stevebob/direction.git"
 readme = "README.md"
 
+[features]
+serialize = ["serde", "coord_2d/serde"]
+
 [dependencies]
 serde = { version = "1.0", features = ["serde_derive"], optional = true }
 coord_2d = "0.2"

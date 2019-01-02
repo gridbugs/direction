@@ -1,6 +1,6 @@
 //! Representations of directions
 extern crate coord_2d;
-#[cfg(feature = "serde")]
+#[cfg(feature = "serialize")]
 #[macro_use]
 extern crate serde;
 
@@ -37,7 +37,7 @@ pub const ALL_ORDINAL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
     raw: ALL_ORDINAL_DIRECTION_BITMAP_RAW,
 };
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum Direction {
@@ -51,7 +51,7 @@ pub enum Direction {
     NorthWest,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum CardinalDirection {
@@ -61,7 +61,7 @@ pub enum CardinalDirection {
     West,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum OrdinalDirection {
@@ -71,7 +71,7 @@ pub enum OrdinalDirection {
     NorthWest,
 }
 
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum DirectionType {
     Cardinal(CardinalDirection),
@@ -506,7 +506,7 @@ impl From<OrdinalDirection> for Direction {
 
 macro_rules! make_direction_iter {
     ($col_name:ident, $iter_name:ident, $type:ident, $count:expr) => {
-        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
         #[derive(Debug, Clone)]
         /// Iterator over all directions of the respectively-named type of direction
         pub struct $iter_name(Range<u8>);
@@ -518,7 +518,7 @@ macro_rules! make_direction_iter {
         }
 
         /// Represents a collection of the respectively-named type of direction
-        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
         #[derive(Debug, Clone, Copy)]
         pub struct $col_name;
         impl IntoIterator for $col_name {
@@ -533,13 +533,13 @@ macro_rules! make_direction_iter {
 
 // IntoIter implementations for iterating over all directions of a type. E.g.:
 // for direction in CardinalDirections { ... }
-make_direction_iter!{Directions, DirectionIter, Direction, NUM_DIRECTIONS}
-make_direction_iter!{CardinalDirections, CardinalDirectionIter, CardinalDirection, NUM_CARDINAL_DIRECTIONS}
-make_direction_iter!{OrdinalDirections, OrdinalDirectionIter, OrdinalDirection, NUM_ORDINAL_DIRECTIONS}
+make_direction_iter! {Directions, DirectionIter, Direction, NUM_DIRECTIONS}
+make_direction_iter! {CardinalDirections, CardinalDirectionIter, CardinalDirection, NUM_CARDINAL_DIRECTIONS}
+make_direction_iter! {OrdinalDirections, OrdinalDirectionIter, OrdinalDirection, NUM_ORDINAL_DIRECTIONS}
 
 macro_rules! make_subdirection_iter {
     ($col_name:ident, $backing_col_name:ident, $iter_name:ident, $backing_iter_name:ident) => {
-        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
         #[derive(Debug, Clone)]
         /// Iterator over a particular collection of `Direction`s
         pub struct $iter_name($backing_iter_name);
@@ -550,7 +550,7 @@ macro_rules! make_subdirection_iter {
             }
         }
 
-        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
         #[derive(Debug, Clone, Copy)]
         /// Represents a particular collection of `Direction`s
         pub struct $col_name;
@@ -566,13 +566,13 @@ macro_rules! make_subdirection_iter {
 
 // IntoIter implementations for iterating over a subset of directions. E.g.:
 // for direction in DirectionsCardinal { ... }
-make_subdirection_iter!{
+make_subdirection_iter! {
     DirectionsCardinal,
     CardinalDirections,
     DirectionCardinalIter,
     CardinalDirectionIter
 }
-make_subdirection_iter!{
+make_subdirection_iter! {
     DirectionsOrdinal,
     OrdinalDirections,
     DirectionOrdinalIter,
@@ -580,7 +580,7 @@ make_subdirection_iter!{
 }
 
 /// Set of directions implemented as a bitmap
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DirectionBitmap {
     pub raw: u8,
@@ -741,7 +741,7 @@ pub type DirectionTableIterMut<'a, T> = slice::IterMut<'a, T>;
 
 macro_rules! make_direction_table {
     ($table_type:ident, $direction_type:ident, $direction_iter:ident, $count:expr) => {
-        #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+        #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
         #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
         pub struct $table_type<T> {
             values: [T; $count],
