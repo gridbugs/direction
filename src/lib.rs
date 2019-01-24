@@ -363,6 +363,22 @@ impl CardinalDirection {
             CardinalDirection::North | CardinalDirection::South => Axis::Y,
         }
     }
+
+    pub fn sign(self) -> i32 {
+        match self {
+            CardinalDirection::South | CardinalDirection::East => 1,
+            CardinalDirection::North | CardinalDirection::West => -1,
+        }
+    }
+
+    pub fn axis_and_sign(self) -> (Axis, i32) {
+        match self {
+            CardinalDirection::North => (Axis::Y, -1),
+            CardinalDirection::East => (Axis::X, 1),
+            CardinalDirection::South => (Axis::Y, 1),
+            CardinalDirection::West => (Axis::X, -1),
+        }
+    }
 }
 
 impl OrdinalDirection {
