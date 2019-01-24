@@ -4,7 +4,7 @@ extern crate coord_2d;
 #[macro_use]
 extern crate serde;
 
-pub use coord_2d::Coord;
+pub use coord_2d::{Axis, Coord};
 use std::mem;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Index, IndexMut, Range};
 use std::slice;
@@ -354,6 +354,13 @@ impl CardinalDirection {
             CardinalDirection::East => OrdinalDirection::SouthWest,
             CardinalDirection::South => OrdinalDirection::NorthWest,
             CardinalDirection::West => OrdinalDirection::NorthEast,
+        }
+    }
+
+    pub fn axis(self) -> Axis {
+        match self {
+            CardinalDirection::East | CardinalDirection::West => Axis::X,
+            CardinalDirection::North | CardinalDirection::South => Axis::Y,
         }
     }
 }
