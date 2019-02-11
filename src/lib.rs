@@ -5,6 +5,7 @@ extern crate coord_2d;
 extern crate serde;
 
 pub use coord_2d::{Axis, Coord};
+use std::iter;
 use std::mem;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Index, IndexMut, Range};
 use std::slice;
@@ -533,6 +534,11 @@ macro_rules! make_direction_iter {
         #[derive(Debug, Clone)]
         /// Iterator over all directions of the respectively-named type of direction
         pub struct $iter_name(Range<u8>);
+        impl $iter_name {
+            pub fn new() -> Self {
+                $iter_name(0..$count as u8)
+            }
+        }
         impl Iterator for $iter_name {
             type Item = $type;
             fn next(&mut self) -> Option<Self::Item> {
@@ -548,7 +554,7 @@ macro_rules! make_direction_iter {
             type Item = $type;
             type IntoIter = $iter_name;
             fn into_iter(self) -> Self::IntoIter {
-                $iter_name(0..$count as u8)
+                $iter_name::new()
             }
         }
     };
@@ -763,19 +769,30 @@ pub type DirectionTableIter<'a, T> = slice::Iter<'a, T>;
 pub type DirectionTableIterMut<'a, T> = slice::IterMut<'a, T>;
 
 macro_rules! make_direction_table {
-    ($table_type:ident, $direction_type:ident, $direction_iter:ident, $count:expr) => {
+    (
+        $table_type:ident,
+        $enumerate_type:ident,
+        $enumerate_mut_type:ident,
+        $direction_type:ident,
+        $direction_into_iter:ident,
+        $direction_iter:ident,
+        $count:expr
+    ) => {
         #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
         #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
         pub struct $table_type<T> {
             values: [T; $count],
         }
+        pub type $enumerate_type<'a, T> = iter::Zip<$direction_iter, DirectionTableIter<'a, T>>;
+        pub type $enumerate_mut_type<'a, T> =
+            iter::Zip<$direction_iter, DirectionTableIterMut<'a, T>>;
         impl<T> $table_type<T> {
             unsafe fn new_uninitialized() -> Self {
                 mem::uninitialized()
             }
             pub fn new_fn<F: FnMut($direction_type) -> T>(mut f: F) -> Self {
                 let mut table = unsafe { Self::new_uninitialized() };
-                for direction in $direction_iter {
+                for direction in $direction_into_iter {
                     table.set(direction, f(direction));
                 }
                 table
@@ -798,11 +815,20 @@ macro_rules! make_direction_table {
             pub fn iter_mut(&mut self) -> DirectionTableIterMut<T> {
                 self.values.iter_mut()
             }
+            pub fn directions(&self) -> $direction_iter {
+                $direction_iter::new()
+            }
+            pub fn enumerate(&self) -> $enumerate_type<T> {
+                self.directions().zip(self.iter())
+            }
+            pub fn enumerate_mut(&mut self) -> $enumerate_mut_type<T> {
+                self.directions().zip(self.iter_mut())
+            }
         }
         impl<T: Clone> $table_type<T> {
             pub fn new_clone(value: T) -> Self {
                 let mut table = unsafe { Self::new_uninitialized() };
-                for direction in $direction_iter {
+                for direction in $direction_into_iter {
                     table.set(direction, value.clone());
                 }
                 table
@@ -811,7 +837,7 @@ macro_rules! make_direction_table {
         impl<T: Default> $table_type<T> {
             pub fn new_default() -> Self {
                 let mut table = unsafe { Self::new_uninitialized() };
-                for direction in $direction_iter {
+                for direction in $direction_into_iter {
                     table.set(direction, Default::default());
                 }
                 table
@@ -831,17 +857,31 @@ macro_rules! make_direction_table {
     };
 }
 
-make_direction_table!(DirectionTable, Direction, Directions, NUM_DIRECTIONS);
+make_direction_table!(
+    DirectionTable,
+    DirectionTableEnumerate,
+    DirectionTableEnumerateMut,
+    Direction,
+    Directions,
+    DirectionIter,
+    NUM_DIRECTIONS
+);
 make_direction_table!(
     CardinalDirectionTable,
+    CardinalDirectionTableEnumerate,
+    CardinalDirectionTableEnumerateMut,
     CardinalDirection,
     CardinalDirections,
+    CardinalDirectionIter,
     NUM_CARDINAL_DIRECTIONS
 );
 make_direction_table!(
     OrdinalDirectionTable,
+    OrdinalDirectionTableEnumerate,
+    OrdinalDirectionTableEnumerateMut,
     OrdinalDirection,
     OrdinalDirections,
+    OrdinalDirectionIter,
     NUM_ORDINAL_DIRECTIONS
 );
 
@@ -870,6 +910,21 @@ mod test {
                 Directions.into_iter().collect::<Vec<_>>(),
                 vec![North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,]
             )
+        }
+    }
+    #[test]
+    fn table_iteration() {
+        {
+            let table = CardinalDirectionTable::new_fn(|d| d);
+            assert!(table.enumerate().all(|(a, &b)| a == b));
+        }
+        {
+            let table = OrdinalDirectionTable::new_fn(|d| d);
+            assert!(table.enumerate().all(|(a, &b)| a == b));
+        }
+        {
+            let table = DirectionTable::new_fn(|d| d);
+            assert!(table.enumerate().all(|(a, &b)| a == b));
         }
     }
 }
