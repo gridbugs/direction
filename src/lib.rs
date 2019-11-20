@@ -7,6 +7,7 @@ extern crate serde;
 pub use coord_2d::{Axis, Coord};
 use std::iter;
 use std::mem;
+use std::mem::MaybeUninit;
 use std::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, Index, IndexMut, Range};
 use std::slice;
 
@@ -42,7 +43,7 @@ pub const ALL_ORDINAL_DIRECTIONS_BITMAP: DirectionBitmap = DirectionBitmap {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum Direction {
-    North,
+    North = 0,
     NorthEast,
     East,
     SouthEast,
@@ -56,7 +57,7 @@ pub enum Direction {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum CardinalDirection {
-    North,
+    North = 0,
     East,
     South,
     West,
@@ -66,7 +67,7 @@ pub enum CardinalDirection {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum OrdinalDirection {
-    NorthEast,
+    NorthEast = 0,
     SouthEast,
     SouthWest,
     NorthWest,
@@ -532,7 +533,7 @@ macro_rules! make_direction_iter {
     ($col_name:ident, $iter_name:ident, $type:ident, $count:expr) => {
         #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
         #[derive(Debug, Clone)]
-        /// Iterator over all directions of the respectively-named type of direction
+        /// Iterate over all directions of the respectively-named type of direction
         pub struct $iter_name(Range<u8>);
         impl $iter_name {
             pub fn new() -> Self {
@@ -787,15 +788,15 @@ macro_rules! make_direction_table {
         pub type $enumerate_mut_type<'a, T> =
             iter::Zip<$direction_iter, DirectionTableIterMut<'a, T>>;
         impl<T> $table_type<T> {
-            unsafe fn new_uninitialized() -> Self {
-                mem::uninitialized()
-            }
             pub fn new_fn<F: FnMut($direction_type) -> T>(mut f: F) -> Self {
-                let mut table = unsafe { Self::new_uninitialized() };
-                for direction in $direction_into_iter {
-                    table.set(direction, f(direction));
-                }
-                table
+                let values = unsafe {
+                    let mut values: [T; $count] = MaybeUninit::uninit().assume_init();
+                    for i in 0..$count {
+                        values[i] = f(mem::transmute(i as u8));
+                    }
+                    values
+                };
+                Self { values }
             }
             pub const fn new_array(values: [T; $count]) -> Self {
                 Self { values }
@@ -827,20 +828,26 @@ macro_rules! make_direction_table {
         }
         impl<T: Clone> $table_type<T> {
             pub fn new_clone(value: T) -> Self {
-                let mut table = unsafe { Self::new_uninitialized() };
-                for direction in $direction_into_iter {
-                    table.set(direction, value.clone());
-                }
-                table
+                let values = unsafe {
+                    let mut values: [T; $count] = MaybeUninit::uninit().assume_init();
+                    for i in 0..$count {
+                        values[i] = value.clone();
+                    }
+                    values
+                };
+                Self { values }
             }
         }
         impl<T: Default> $table_type<T> {
             pub fn new_default() -> Self {
-                let mut table = unsafe { Self::new_uninitialized() };
-                for direction in $direction_into_iter {
-                    table.set(direction, Default::default());
-                }
-                table
+                let values = unsafe {
+                    let mut values: [T; $count] = MaybeUninit::uninit().assume_init();
+                    for i in 0..$count {
+                        values[i] = Default::default();
+                    }
+                    values
+                };
+                Self { values }
             }
         }
         impl<T> Index<$direction_type> for $table_type<T> {
