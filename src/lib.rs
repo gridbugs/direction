@@ -1,8 +1,13 @@
 //! Representations of directions
-extern crate coord_2d;
+
 #[cfg(feature = "serialize")]
-#[macro_use]
-extern crate serde;
+use serde::{Deserialize, Serialize};
+
+#[cfg(feature = "rand")]
+use rand::{
+    distributions::{Distribution, Standard},
+    Rng,
+};
 
 pub use coord_2d::{Axis, Coord};
 use std::iter;
@@ -526,6 +531,30 @@ impl From<CardinalDirection> for Direction {
 impl From<OrdinalDirection> for Direction {
     fn from(o: OrdinalDirection) -> Self {
         o.direction()
+    }
+}
+
+#[cfg(feature = "rand")]
+impl Distribution<Direction> for Standard {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Direction {
+        let index = rng.gen_range(0, NUM_DIRECTIONS as u8);
+        unsafe { mem::transmute(index) }
+    }
+}
+
+#[cfg(feature = "rand")]
+impl Distribution<CardinalDirection> for Standard {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> CardinalDirection {
+        let index = rng.gen_range(0, NUM_CARDINAL_DIRECTIONS as u8);
+        unsafe { mem::transmute(index) }
+    }
+}
+
+#[cfg(feature = "rand")]
+impl Distribution<OrdinalDirection> for Standard {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> OrdinalDirection {
+        let index = rng.gen_range(0, NUM_ORDINAL_DIRECTIONS as u8);
+        unsafe { mem::transmute(index) }
     }
 }
 
