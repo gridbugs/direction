@@ -204,11 +204,11 @@ impl Direction {
         }
     }
 
-    pub fn bitmap_raw(self) -> u8 {
+    pub const fn bitmap_raw(self) -> u8 {
         1 << self as usize
     }
 
-    pub fn bitmap(self) -> DirectionBitmap {
+    pub const fn bitmap(self) -> DirectionBitmap {
         DirectionBitmap::new(self.bitmap_raw())
     }
 
