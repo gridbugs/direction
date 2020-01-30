@@ -270,6 +270,10 @@ impl Direction {
             _ => None,
         }
     }
+
+    pub const fn all() -> DirectionIter {
+        DirectionIter::new()
+    }
 }
 
 impl CardinalDirection {
@@ -385,6 +389,14 @@ impl CardinalDirection {
             CardinalDirection::South => (Axis::Y, 1),
             CardinalDirection::West => (Axis::X, -1),
         }
+    }
+
+    pub const fn all() -> CardinalDirectionIter {
+        CardinalDirectionIter::new()
+    }
+
+    pub const fn all_directions() -> DirectionCardinalIter {
+        DirectionCardinalIter::new()
     }
 }
 
@@ -520,6 +532,14 @@ impl OrdinalDirection {
         let (a, b) = self.to_cardinals();
         a.direction().bitmap() | b.direction().bitmap()
     }
+
+    pub const fn all() -> OrdinalDirectionIter {
+        OrdinalDirectionIter::new()
+    }
+
+    pub const fn all_directions() -> DirectionOrdinalIter {
+        DirectionOrdinalIter::new()
+    }
 }
 
 impl From<CardinalDirection> for Direction {
@@ -565,7 +585,7 @@ macro_rules! make_direction_iter {
         /// Iterate over all directions of the respectively-named type of direction
         pub struct $iter_name(Range<u8>);
         impl $iter_name {
-            pub fn new() -> Self {
+            pub const fn new() -> Self {
                 $iter_name(0..$count as u8)
             }
         }
@@ -602,6 +622,13 @@ macro_rules! make_subdirection_iter {
         #[derive(Debug, Clone)]
         /// Iterator over a particular collection of `Direction`s
         pub struct $iter_name($backing_iter_name);
+
+        impl $iter_name {
+            pub const fn new() -> Self {
+                Self($backing_iter_name::new())
+            }
+        }
+
         impl Iterator for $iter_name {
             type Item = Direction;
             fn next(&mut self) -> Option<Self::Item> {
