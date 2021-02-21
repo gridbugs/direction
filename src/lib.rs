@@ -561,7 +561,7 @@ impl From<OrdinalDirection> for Direction {
 #[cfg(feature = "rand")]
 impl Distribution<Direction> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Direction {
-        let index = rng.gen_range(0, NUM_DIRECTIONS as u8);
+        let index = rng.gen_range(0..NUM_DIRECTIONS as u8);
         unsafe { mem::transmute(index) }
     }
 }
@@ -569,7 +569,7 @@ impl Distribution<Direction> for Standard {
 #[cfg(feature = "rand")]
 impl Distribution<CardinalDirection> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> CardinalDirection {
-        let index = rng.gen_range(0, NUM_CARDINAL_DIRECTIONS as u8);
+        let index = rng.gen_range(0..NUM_CARDINAL_DIRECTIONS as u8);
         unsafe { mem::transmute(index) }
     }
 }
@@ -577,7 +577,7 @@ impl Distribution<CardinalDirection> for Standard {
 #[cfg(feature = "rand")]
 impl Distribution<OrdinalDirection> for Standard {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> OrdinalDirection {
-        let index = rng.gen_range(0, NUM_ORDINAL_DIRECTIONS as u8);
+        let index = rng.gen_range(0..NUM_ORDINAL_DIRECTIONS as u8);
         unsafe { mem::transmute(index) }
     }
 }
