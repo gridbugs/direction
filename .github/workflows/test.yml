@@ -14,4 +14,4 @@ jobs:
     - uses: actions/checkout@master
     - run: |
         cargo test
-        cargo test --features serialize
+        cargo test --all-features
