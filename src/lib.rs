@@ -850,11 +850,11 @@ macro_rules! make_direction_table {
         impl<T> $table_type<T> {
             pub fn new_fn<F: FnMut($direction_type) -> T>(mut f: F) -> Self {
                 let values = unsafe {
-                    let mut values: [T; $count] = MaybeUninit::uninit().assume_init();
+                    let mut values: [MaybeUninit<T>; $count] = MaybeUninit::uninit().assume_init();
                     for i in 0..$count {
-                        values[i] = f(mem::transmute(i as u8));
+                        values[i].write(f(mem::transmute(i as u8)));
                     }
-                    values
+                    mem::transmute_copy::<[MaybeUninit<T>; $count], [T; $count]>(&values)
                 };
                 Self { values }
             }
