@@ -9,7 +9,7 @@ use rand::{
     Rng,
 };
 
-pub use coord_2d::{Axis, Coord};
+pub use coord_2d::{Axis, ICoord};
 use std::iter;
 use std::mem;
 use std::mem::MaybeUninit;
@@ -86,16 +86,16 @@ pub enum DirectionType {
 }
 
 impl Direction {
-    pub fn from_unit_coord(coord: Coord) -> Self {
+    pub fn from_unit_coord(coord: ICoord) -> Self {
         match coord {
-            Coord { x: 1, y: 0 } => Direction::East,
-            Coord { x: -1, y: 0 } => Direction::West,
-            Coord { x: 0, y: 1 } => Direction::South,
-            Coord { x: 0, y: -1 } => Direction::North,
-            Coord { x: 1, y: 1 } => Direction::SouthEast,
-            Coord { x: 1, y: -1 } => Direction::NorthEast,
-            Coord { x: -1, y: 1 } => Direction::SouthWest,
-            Coord { x: -1, y: -1 } => Direction::NorthWest,
+            ICoord { x: 1, y: 0 } => Direction::East,
+            ICoord { x: -1, y: 0 } => Direction::West,
+            ICoord { x: 0, y: 1 } => Direction::South,
+            ICoord { x: 0, y: -1 } => Direction::North,
+            ICoord { x: 1, y: 1 } => Direction::SouthEast,
+            ICoord { x: 1, y: -1 } => Direction::NorthEast,
+            ICoord { x: -1, y: 1 } => Direction::SouthWest,
+            ICoord { x: -1, y: -1 } => Direction::NorthWest,
             _ => panic!("Unexpected coord: {:?}", coord),
         }
     }
@@ -113,16 +113,16 @@ impl Direction {
         }
     }
 
-    pub fn coord(self) -> Coord {
+    pub fn coord(self) -> ICoord {
         match self {
-            Direction::North => Coord::new(0, -1),
-            Direction::NorthEast => Coord::new(1, -1),
-            Direction::East => Coord::new(1, 0),
-            Direction::SouthEast => Coord::new(1, 1),
-            Direction::South => Coord::new(0, 1),
-            Direction::SouthWest => Coord::new(-1, 1),
-            Direction::West => Coord::new(-1, 0),
-            Direction::NorthWest => Coord::new(-1, -1),
+            Direction::North => ICoord::new(0, -1),
+            Direction::NorthEast => ICoord::new(1, -1),
+            Direction::East => ICoord::new(1, 0),
+            Direction::SouthEast => ICoord::new(1, 1),
+            Direction::South => ICoord::new(0, 1),
+            Direction::SouthWest => ICoord::new(-1, 1),
+            Direction::West => ICoord::new(-1, 0),
+            Direction::NorthWest => ICoord::new(-1, -1),
         }
     }
 
@@ -277,12 +277,12 @@ impl Direction {
 }
 
 impl CardinalDirection {
-    pub fn from_unit_coord(coord: Coord) -> Self {
+    pub fn from_unit_coord(coord: ICoord) -> Self {
         match coord {
-            Coord { x: 1, y: 0 } => CardinalDirection::East,
-            Coord { x: -1, y: 0 } => CardinalDirection::West,
-            Coord { x: 0, y: 1 } => CardinalDirection::South,
-            Coord { x: 0, y: -1 } => CardinalDirection::North,
+            ICoord { x: 1, y: 0 } => CardinalDirection::East,
+            ICoord { x: -1, y: 0 } => CardinalDirection::West,
+            ICoord { x: 0, y: 1 } => CardinalDirection::South,
+            ICoord { x: 0, y: -1 } => CardinalDirection::North,
             _ => panic!("Unexpected coord: {:?}", coord),
         }
     }
@@ -305,12 +305,12 @@ impl CardinalDirection {
         }
     }
 
-    pub fn coord(self) -> Coord {
+    pub fn coord(self) -> ICoord {
         match self {
-            CardinalDirection::North => Coord::new(0, -1),
-            CardinalDirection::East => Coord::new(1, 0),
-            CardinalDirection::South => Coord::new(0, 1),
-            CardinalDirection::West => Coord::new(-1, 0),
+            CardinalDirection::North => ICoord::new(0, -1),
+            CardinalDirection::East => ICoord::new(1, 0),
+            CardinalDirection::South => ICoord::new(0, 1),
+            CardinalDirection::West => ICoord::new(-1, 0),
         }
     }
 
@@ -405,12 +405,12 @@ impl CardinalDirection {
 }
 
 impl OrdinalDirection {
-    pub fn from_unit_coord(coord: Coord) -> Self {
+    pub fn from_unit_coord(coord: ICoord) -> Self {
         match coord {
-            Coord { x: 1, y: 1 } => OrdinalDirection::SouthEast,
-            Coord { x: 1, y: -1 } => OrdinalDirection::NorthEast,
-            Coord { x: -1, y: 1 } => OrdinalDirection::SouthWest,
-            Coord { x: -1, y: -1 } => OrdinalDirection::NorthWest,
+            ICoord { x: 1, y: 1 } => OrdinalDirection::SouthEast,
+            ICoord { x: 1, y: -1 } => OrdinalDirection::NorthEast,
+            ICoord { x: -1, y: 1 } => OrdinalDirection::SouthWest,
+            ICoord { x: -1, y: -1 } => OrdinalDirection::NorthWest,
             _ => panic!("Unexpected coord: {:?}", coord),
         }
     }
@@ -433,12 +433,12 @@ impl OrdinalDirection {
         }
     }
 
-    pub fn coord(self) -> Coord {
+    pub fn coord(self) -> ICoord {
         match self {
-            OrdinalDirection::NorthEast => Coord::new(1, -1),
-            OrdinalDirection::SouthEast => Coord::new(1, 1),
-            OrdinalDirection::SouthWest => Coord::new(-1, 1),
-            OrdinalDirection::NorthWest => Coord::new(-1, -1),
+            OrdinalDirection::NorthEast => ICoord::new(1, -1),
+            OrdinalDirection::SouthEast => ICoord::new(1, 1),
+            OrdinalDirection::SouthWest => ICoord::new(-1, 1),
+            OrdinalDirection::NorthWest => ICoord::new(-1, -1),
         }
     }
 
@@ -499,24 +499,24 @@ impl OrdinalDirection {
     pub fn from_cardinals(a: CardinalDirection, b: CardinalDirection) -> Option<Self> {
         match a {
             CardinalDirection::North => match b {
-                CardinalDirection::East => return Some(OrdinalDirection::NorthEast),
-                CardinalDirection::West => return Some(OrdinalDirection::NorthWest),
-                _ => return None,
+                CardinalDirection::East => Some(OrdinalDirection::NorthEast),
+                CardinalDirection::West => Some(OrdinalDirection::NorthWest),
+                _ => None,
             },
             CardinalDirection::East => match b {
-                CardinalDirection::North => return Some(OrdinalDirection::NorthEast),
-                CardinalDirection::South => return Some(OrdinalDirection::SouthEast),
-                _ => return None,
+                CardinalDirection::North => Some(OrdinalDirection::NorthEast),
+                CardinalDirection::South => Some(OrdinalDirection::SouthEast),
+                _ => None,
             },
             CardinalDirection::South => match b {
-                CardinalDirection::East => return Some(OrdinalDirection::SouthEast),
-                CardinalDirection::West => return Some(OrdinalDirection::SouthWest),
-                _ => return None,
+                CardinalDirection::East => Some(OrdinalDirection::SouthEast),
+                CardinalDirection::West => Some(OrdinalDirection::SouthWest),
+                _ => None,
             },
             CardinalDirection::West => match b {
-                CardinalDirection::North => return Some(OrdinalDirection::NorthWest),
-                CardinalDirection::South => return Some(OrdinalDirection::SouthWest),
-                _ => return None,
+                CardinalDirection::North => Some(OrdinalDirection::NorthWest),
+                CardinalDirection::South => Some(OrdinalDirection::SouthWest),
+                _ => None,
             },
         }
     }
@@ -599,6 +599,11 @@ macro_rules! make_direction_iter {
                 self.0.next().map(|n| unsafe { mem::transmute(n) })
             }
         }
+        impl Default for $iter_name {
+            fn default() -> Self {
+                Self::new()
+            }
+        }
 
         /// Represents a collection of the respectively-named type of direction
         #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
@@ -632,11 +637,15 @@ macro_rules! make_subdirection_iter {
                 Self($backing_iter_name::new())
             }
         }
-
         impl Iterator for $iter_name {
             type Item = Direction;
             fn next(&mut self) -> Option<Self::Item> {
                 self.0.next().map(|d| d.direction())
+            }
+        }
+        impl Default for $iter_name {
+            fn default() -> Self {
+                Self::new()
             }
         }
 
@@ -852,7 +861,7 @@ macro_rules! make_direction_table {
                 let values = unsafe {
                     let mut values: [T; $count] = MaybeUninit::uninit().assume_init();
                     for i in 0..$count {
-                        values[i] = f(mem::transmute(i as u8));
+                        values[i] = f(mem::transmute::<u8, $direction_type>(i as u8));
                     }
                     values
                 };
@@ -870,19 +879,19 @@ macro_rules! make_direction_table {
             pub fn get_mut(&mut self, direction: $direction_type) -> &mut T {
                 &mut self.values[direction as usize]
             }
-            pub fn iter(&self) -> DirectionTableIter<T> {
+            pub fn iter(&self) -> DirectionTableIter<'_, T> {
                 self.values.iter()
             }
-            pub fn iter_mut(&mut self) -> DirectionTableIterMut<T> {
+            pub fn iter_mut(&mut self) -> DirectionTableIterMut<'_, T> {
                 self.values.iter_mut()
             }
             pub fn directions(&self) -> $direction_iter {
                 $direction_iter::new()
             }
-            pub fn enumerate(&self) -> $enumerate_type<T> {
+            pub fn enumerate(&self) -> $enumerate_type<'_, T> {
                 self.directions().zip(self.iter())
             }
-            pub fn enumerate_mut(&mut self) -> $enumerate_mut_type<T> {
+            pub fn enumerate_mut(&mut self) -> $enumerate_mut_type<'_, T> {
                 self.directions().zip(self.iter_mut())
             }
         }
