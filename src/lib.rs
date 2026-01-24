@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "rand")]
 use rand::{
-    distributions::{Distribution, Standard},
     Rng,
+    distr::{Distribution, StandardUniform},
 };
 
 pub use coord_2d::{Axis, ICoord};
@@ -559,25 +559,25 @@ impl From<OrdinalDirection> for Direction {
 }
 
 #[cfg(feature = "rand")]
-impl Distribution<Direction> for Standard {
+impl Distribution<Direction> for StandardUniform {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Direction {
-        let index = rng.gen_range(0..NUM_DIRECTIONS as u8);
+        let index = rng.random_range(0..NUM_DIRECTIONS as u8);
         unsafe { mem::transmute(index) }
     }
 }
 
 #[cfg(feature = "rand")]
-impl Distribution<CardinalDirection> for Standard {
+impl Distribution<CardinalDirection> for StandardUniform {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> CardinalDirection {
-        let index = rng.gen_range(0..NUM_CARDINAL_DIRECTIONS as u8);
+        let index = rng.random_range(0..NUM_CARDINAL_DIRECTIONS as u8);
         unsafe { mem::transmute(index) }
     }
 }
 
 #[cfg(feature = "rand")]
-impl Distribution<OrdinalDirection> for Standard {
+impl Distribution<OrdinalDirection> for StandardUniform {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> OrdinalDirection {
-        let index = rng.gen_range(0..NUM_ORDINAL_DIRECTIONS as u8);
+        let index = rng.random_range(0..NUM_ORDINAL_DIRECTIONS as u8);
         unsafe { mem::transmute(index) }
     }
 }
@@ -984,7 +984,9 @@ mod test {
             use Direction::*;
             assert_eq!(
                 Directions.into_iter().collect::<Vec<_>>(),
-                vec![North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,]
+                vec![
+                    North, NorthEast, East, SouthEast, South, SouthWest, West, NorthWest,
+                ]
             )
         }
     }
